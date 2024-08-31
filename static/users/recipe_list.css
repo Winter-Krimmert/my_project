@@ -1,0 +1,52 @@
+/* General layout for recipe cards */
+.recipe-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.recipe-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.recipe-card img {
+    width: 100%;
+    height: auto;
+}
+
+.recipe-card h2 {
+    margin: 0;
+    padding: 10px;
+    font-size: 18px;
+    background-color: #f8f8f8;
+}
+
+.recipe-card a {
+    text-decoration: none;
+    color: #333;
+}
+
+.recipe-card:hover {
+    transform: scale(1.05);
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    margin: 0 5px;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.pagination .current {
+    margin: 0 5px;
+}

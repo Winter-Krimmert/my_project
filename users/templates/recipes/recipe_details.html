@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ recipe.title }}</title>
+    <link rel="stylesheet" href="{% static 'users/recipe_detail.css' %}">
+</head>
+<body>
+    <h1>{{ recipe.title }}</h1>
+    <p><strong>Description:</strong> {{ recipe.description }}</p>
+    <p><strong>Servings:</strong> {{ recipe.servings }}</p>
+    <p><strong>Cook Time:</strong> {{ recipe.cookTime }}</p>
+    <p><strong>Keywords:</strong> {{ recipe.keywords|join:", " }}</p>
+
+    <h2>Ingredients</h2>
+    <ul>
+        {% for ingredient in recipe.ingredients %}
+            <li>{{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.name }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Instructions</h2>
+    <ol>
+        {% for step in recipe.instructions %}
+            <li>
+                <p><strong>Step {{ step.stepNumber }}:</strong> {{ step.description }}</p>
+                {% if step.photo %}
+                    <img src="{{ step.photo }}" alt="Step {{ step.stepNumber }} photo">
+                {% endif %}
+                {% if step.video %}
+                    <p><a href="{{ step.video }}">Watch Video</a></p>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+
+    {% if recipe.media %}
+        <h2>Media</h2>
+        <div class="media-gallery">
+            {% for media_item in recipe.media %}
+                {% if media_item.type == "image" %}
+                    <img src="{{ media_item.url }}" alt="Recipe Image">
+                {% elif media_item.type == "video" %}
+                    <video src="{{ media_item.url }}" controls></video>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <p><strong>Created At:</strong> {{ recipe.createdAt }}</p>
+    <p><strong>Updated At:</strong> {{ recipe.updatedAt }}</p>
+</body>
+</html>

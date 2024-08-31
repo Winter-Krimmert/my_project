@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login with Facebook</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'users/login.css' %}">
+    
+    <!-- Facebook SDK for JavaScript -->
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '389159887518720', // Replace with your Facebook App ID
+                cookie     : true,              // Enable cookies to allow the server to access the session.
+                xfbml      : true,              // Parse social plugins on this webpage.
+                version    : 'v20.0'            // Use this Graph API version for this call.
+            });
+            FB.AppEvents.logPageView();
+
+            // Check the login status when the SDK is initialized
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+            });
+        };
+
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        // This function is called when the SDK is initialized and checks the user's login status
+        function statusChangeCallback(response) {
+            console.log('statusChangeCallback');
+            console.log(response);
+
+            if (response.status === 'connected') {
+                // Logged into your webpage and Facebook
+                document.getElementById('access_token').value = response.authResponse.accessToken;
+                testAPI();
+            } else {
+                // Not logged into your webpage or we are unable to tell
+                document.getElementById('status').innerHTML = 'Please log into this webpage.';
+            }
+        }
+
+        // Function to check the login state
+        function checkLoginState() {
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+            });
+        }
+
+        // Test API to fetch user information after login
+        function testAPI() {
+            console.log('Welcome! Fetching your information...');
+            FB.api('/me', function(response) {
+                console.log('Successful login for: ' + response.name);
+                document.getElementById('status').innerHTML =
+                    'Thanks for logging in, ' + response.name + '!';
+            });
+        }
+
+        // Trigger checkLoginState when the page loads
+        window.onload = checkLoginState;
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login with Facebook</h1>
+        <p>You are about to log in to Recipe-z using your Facebook account.</p>
+        
+        <form method="post" action="/api/facebook/login/">
+            {% csrf_token %}
+            <input type="hidden" name="access_token" id="access_token">
+            <button type="submit">Continue with Facebook</button>
+        </form>
+
+        <p><a href="/api/login/">Cancel</a> and return to the login page.</p>
+    </div>
+
+    <!-- Display user's login status or welcome message -->
+    <div id="status"></div>
+    
+    <!-- JavaScript to handle Facebook login -->
+    <script>
+        // Re-run the login status check when the form is submitted
+        document.querySelector('form').addEventListener('submit', checkLoginState);
+    </script>
+</body>
+</html>

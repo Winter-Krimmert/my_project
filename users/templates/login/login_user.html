@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to Recipe-z</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'users/login.css' %}">
+    <script>
+        // JavaScript to show popup message
+        function showPopup(message) {
+            var popup = document.getElementById('login-popup');
+            popup.querySelector('p').textContent = message;
+            popup.style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var message = "{{ message|escapejs }}"; // Escape JavaScript characters
+            if (message) {
+                showPopup(message);
+            }
+
+            // Add event listener to the logout button
+            document.getElementById('logout-button').addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                fetch('/api/logout/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}' // Add the CSRF token to the headers
+                    },
+                    credentials: 'include' // Include cookies in the request
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Logout failed');
+                    }
+                    return response.json(); // Assuming your server returns JSON
+                })
+                .then(data => {
+                    showPopup('Logout successful!');
+                    setTimeout(() => {
+                        window.location.href = '/api/login/'; // Redirect after logout
+                    }, 1000); // Wait 1 second before redirect
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Popup Message -->
+    <div id="login-popup" class="login-popup">
+        <p></p>
+    </div>
+
+    <div class="container">
+        <h1>Login to Your Account</h1>
+        
+        <div class="login-container">
+            {% if error_message %}
+                <p class="error">{{ error_message }}</p>
+            {% endif %}
+            <form method="post" action="/api/login/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" id="password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>        
+            <p>Don't have an account? <a href="{% url 'user-register' %}">Register here</a>.</p>
+
+            <!-- Add a logout button with an ID for JavaScript -->
+            <button id="logout-button">Logout</button>
+        </div>
+    </div>
+</body>
+</html>

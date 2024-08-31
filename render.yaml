@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: recipe-z
+    repo: https://github.com/Winter-Krimmert/Mongo-Django
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: "cd my_project && gunicorn my_project.wsgi --bind 0.0.0.0:$PORT"
+    runtime: python
+    plan: free
+    autoDeploy: true

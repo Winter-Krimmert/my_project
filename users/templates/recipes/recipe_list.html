@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe List</title>
+    <link rel="stylesheet" href="{% static 'users/recipe_list.css' %}">
+</head>
+<body>
+    <h1>Recipe List</h1>
+    
+    <!-- Button to Add a New Recipe -->
+    <!-- This link directs the user to a form where they can create a new recipe -->
+    <a href="{% url 'recipe-create' %}" class="add-recipe-button">Add a New Recipe</a>
+
+    <!-- Recipe Cards Container -->
+    <!-- This section contains the grid of recipe cards -->
+    <!-- Each recipe card displays the recipe's image and title -->
+    <div class="recipe-cards">
+        {% for recipe in recipes %}
+            <!-- Individual Recipe Card -->
+            <!-- The card links to the detailed page for each recipe -->
+            <div class="recipe-card">
+                <a href="{% url 'recipe-detail' recipe.pk %}">
+                    <!-- Recipe Image -->
+                    <img src="{{ recipe.photo }}" alt="{{ recipe.title }}">
+                    <!-- Recipe Title -->
+                    <h2>{{ recipe.title }}</h2>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination Section -->
+    <!-- This section allows users to navigate between pages of recipe cards -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if recipes.has_previous %}
+                <!-- Link to the first page -->
+                <a href="?page=1">&laquo; first</a>
+                <!-- Link to the previous page -->
+                <a href="?page={{ recipes.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                <!-- Display current page and total number of pages -->
+                Page {{ recipes.number }} of {{ recipes.paginator.num_pages }}.
+            </span>
+
+            {% if recipes.has_next %}
+                <!-- Link to the next page -->
+                <a href="?page={{ recipes.next_page_number }}">next</a>
+                <!-- Link to the last page -->
+                <a href="?page={{ recipes.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</body>
+</html>

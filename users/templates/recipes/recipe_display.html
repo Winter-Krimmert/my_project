@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Display</title>
+    <link rel="stylesheet" href="{% static 'path/to/recipe_display.css' %}"> <!-- Update with your CSS file path -->
+</head>
+<body>
+    <h1>Recipe List</h1>
+    <div class="recipe-container">
+        {% for recipe in recipes %}
+            <div class="recipe-card">
+                <h2>{{ recipe.recipeDetails.title }}</h2>
+                <img src="{{ recipe.recipeDetails.photo }}" alt="{{ recipe.recipeDetails.title }}" class="recipe-image">
+                
+                <p><strong>Description:</strong> {{ recipe.recipeDetails.description }}</p>
+                <p><strong>Servings:</strong> {{ recipe.recipeDetails.servings }}</p>
+                <p><strong>Cook Time:</strong> {{ recipe.recipeDetails.cookTime }}</p>
+                <h3>Ingredients:</h3>
+                <ul>
+                    {% for ingredient in recipe.recipeDetails.ingredients %}
+                        <li>
+                            <img src="{{ ingredient.image }}" alt="{{ ingredient.name }}" class="ingredient-image"> {{ ingredient.name }} - {{ ingredient.amount.us.value }} {{ ingredient.amount.us.unit }}
+                        </li>
+                    {% endfor %}
+                </ul>
+                
+                <h3>Instructions:</h3>
+                <ol>
+                    {% for instruction in recipe.recipeDetails.instructions %}
+                        <li>{{ instruction.step }}</li>
+                    {% endfor %}
+                </ol>
+
+                <h3>Cuisine:</h3>
+                <p>{{ recipe.recipeDetails.cuisine }}</p> <!-- Add this if you're capturing cuisine in your form -->
+                
+                <h3>Similar Recipes:</h3>
+                <ul>
+                    {% for similar in recipe.recipeDetails.similarRecipes %}
+                        <li><a href="{{ similar.url }}">{{ similar.title }}</a></li> <!-- Assuming you have a URL field in similar recipes -->
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

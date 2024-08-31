@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login with Google</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'users/login.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login with Google</h1>
+        <p>You are about to log in to Recipe-z using your Google account.</p>
+        
+        <form method="post" action="/api/google/login/">
+            {% csrf_token %}
+            <input type="hidden" name="access_token" id="access_token">
+            <button type="submit">Continue with Google</button>
+        </form>
+
+        <p><a href="/api/login/">Cancel</a> and return to the login page.</p>
+    </div>
+
+    <!-- You might want to add JavaScript to handle Google OAuth and get the access token -->
+    <script>
+        // Example: Assume you have integrated Google SDK here to get the access token.
+        // When the user logs in with Google, the access token should be set in the form input.
+    </script>
+</body>
+</html>

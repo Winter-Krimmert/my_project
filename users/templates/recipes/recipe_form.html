@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Recipe</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'users/recipe_form.css' %}">
+    <style>
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create a New Recipe</h1>
+
+    <form id="recipe-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h2>Recipe Details</h2>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required minlength="3" maxlength="200" placeholder="Enter recipe title">
+        <span class="error-message" id="title-error"></span>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required minlength="10" placeholder="Enter recipe description"></textarea>
+        <span class="error-message" id="description-error"></span>
+
+        <label for="keywords">Keywords (comma-separated):</label>
+        <input type="text" id="keywords" name="keywords" required pattern="^[a-zA-Z0-9]+(,[a-zA-Z0-9]+)*$" placeholder="Enter keywords, separated by commas">
+        <span class="error-message" id="keywords-error"></span>
+
+        <label for="servings">Servings:</label>
+        <input type="number" id="servings" name="servings" required min="1" placeholder="Number of servings">
+        <span class="error-message" id="servings-error"></span>
+
+        <label for="cook_time">Cook Time:</label>
+        <input type="text" id="cook_time" name="cook_time" required pattern="^[0-9]+ ?(minutes|hours)$" placeholder="e.g., 30 minutes">
+        <span class="error-message" id="cook_time-error"></span>
+
+        <h2>Measurement System</h2>
+        <label for="measurement_system">Measurement System:</label>
+        <select id="measurement_system" name="measurement_system" required>
+            <option value="metric">Metric</option>
+            <option value="standard">Standard</option>
+        </select>
+
+        <h2>Ingredients</h2>
+        <label>Enter Ingredients:</label>
+        <div>
+            <input type="radio" name="ingredient_entry_method" value="step_by_step" checked onclick="toggleIngredientInput()"> Step by Step
+            <input type="radio" name="ingredient_entry_method" value="single_block" onclick="toggleIngredientInput()"> Single Block
+        </div>
+
+        <div id="ingredients-step-by-step" class="scrollable-container">
+            <!-- Initial ingredient form -->
+            <div class="ingredient-form">
+                <label for="ingredient_name">Ingredient Name:</label>
+                <input type="text" name="ingredient_name" required>
+                <label for="ingredient_quantity">Quantity:</label>
+                <input type="number" name="ingredient_quantity" required>
+                <label for="ingredient_unit">Unit:</label>
+                <input type="text" name="ingredient_unit" placeholder="e.g., lbs or grams" required>
+                <label for="ingredient_image">Ingredient Image URL:</label>
+                <input type="url" name="ingredient_image">
+                <label for="ingredient_image_upload">Or Upload Image:</label>
+                <input type="file" name="ingredient_image_upload" accept="image/*">
+                <button type="button" class="remove-item remove-ingredient">Remove Ingredient</button>
+            </div>
+        </div>
+        <button type="button" id="add-ingredient">Add Ingredient</button>
+
+        <div id="ingredients-single-block" style="display:none;">
+            <label for="ingredients_text">Ingredients (comma-separated):</label>
+            <textarea name="ingredients_text"></textarea>
+        </div>
+
+        <h2>Instructions</h2>
+        <label>Enter Instructions:</label>
+        <div>
+            <input type="radio" name="instruction_entry_method" value="step_by_step" checked onclick="toggleInstructionInput()"> Step by Step
+            <input type="radio" name="instruction_entry_method" value="single_block" onclick="toggleInstructionInput()"> Single Block
+        </div>
+
+        <div id="instructions-step-by-step" class="scrollable-container">
+            <!-- Initial instruction form -->
+            <div class="instruction-form">
+                <label for="instruction_step_number">Step Number:</label>
+                <input type="number" name="instruction_step_number" required>
+                <label for="instruction_description">Description:</label>
+                <textarea name="instruction_description" required></textarea>
+                <label for="instruction_photo">Photo URL:</label>
+                <input type="url" name="instruction_photo">
+                <label for="instruction_photo_upload">Or Upload Photo:</label>
+                <input type="file" name="instruction_photo_upload" accept="image/*">
+                <label for="instruction_video">Video URL:</label>
+                <input type="url" name="instruction_video">
+                <label for="instruction_video_upload">Or Upload Video:</label>
+                <input type="file" name="instruction_video_upload" accept="video/*">
+                <button type="button" class="remove-item remove-instruction">Remove Instruction</button>
+            </div>
+        </div>
+        <button type="button" id="add-instruction">Add Instruction</button>
+
+        <div id="instructions-single-block" style="display:none;">
+            <label for="instructions_text">Instructions:</label>
+            <textarea name="instructions_text"></textarea>
+        </div>
+
+        <h2>Media</h2>
+        <div id="media-container">
+            <!-- Initial media form -->
+            <div class="media-form">
+                <label for="media_type">Media Type:</label>
+                <select name="media_type" required>
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                </select>
+                <label for="media_url">Media URL:</label>
+                <input type="url" name="media_url" required>
+                <label for="media_upload">Or Upload Media:</label>
+                <input type="file" name="media_upload">
+                <button type="button" class="remove-item remove-media">Remove Media</button>
+            </div>
+        </div>
+        <button type="button" id="add-media">Add Media</button>
+
+        <button type="submit">Save Recipe</button>
+    </form>
+
+    <a href="{% url 'recipe-list-create' %}">Back to Recipe List</a>
+
+    <script>
+        // Function to toggle ingredient input method
+        function toggleIngredientInput() {
+            const stepByStep = document.getElementById('ingredients-step-by-step');
+            const singleBlock = document.getElementById('ingredients-single-block');
+            const measurementSystem = document.getElementById('measurement_system').value;
+
+            if (document.querySelector('input[name="ingredient_entry_method"]:checked').value === 'step_by_step') {
+                stepByStep.style.display = 'block';
+                singleBlock.style.display = 'none';
+
+                // Update placeholders based on measurement system
+                document.querySelectorAll('.ingredient-form input[name="ingredient_quantity"]').forEach(field =>
+                    field.placeholder = measurementSystem === 'metric' ? 'grams' : 'lbs');
+                document.querySelectorAll('.ingredient-form input[name="ingredient_unit"]').forEach(field =>
+                    field.placeholder = measurementSystem === 'metric' ? 'grams' : 'lbs');
+
+                // Make ingredient fields required
+                document.querySelectorAll('.ingredient-form input').forEach(field => field.required = true);
+
+                // Ensure single block ingredients textarea is not required
+                document.querySelectorAll('#ingredients-single-block textarea').forEach(field => field.required = false);
+            } else {
+                stepByStep.style.display = 'none';
+                singleBlock.style.display = 'block';
+
+                // Make the single block ingredients textarea required
+                document.querySelectorAll('#ingredients-single-block textarea').forEach(field => field.required = true);
+
+                // Remove required attribute for step-by-step inputs
+                document.querySelectorAll('.ingredient-form input').forEach(field => field.required = false);
+            }
+        }
+
+        // Function to toggle instruction input method
+        function toggleInstructionInput() {
+            const stepByStep = document.getElementById('instructions-step-by-step');
+            const singleBlock = document.getElementById('instructions-single-block');
+
+            if (document.querySelector('input[name="instruction_entry_method"]:checked').value === 'step_by_step') {
+                stepByStep.style.display = 'block';
+                singleBlock.style.display = 'none';
+
+                // Make instruction fields required
+                document.querySelectorAll('.instruction-form input, .instruction-form textarea').forEach(field => field.required = true);
+
+                // Ensure single block instructions textarea is not required
+                document.querySelectorAll('#instructions-single-block textarea').forEach(field => field.required = false);
+            } else {
+                stepByStep.style.display = 'none';
+                singleBlock.style.display = 'block';
+
+                // Make the single block instructions textarea required
+                document.querySelectorAll('#instructions-single-block textarea').forEach(field => field.required = true);
+
+                // Remove required attribute for step-by-step inputs
+                document.querySelectorAll('.instruction-form input, .instruction-form textarea').forEach(field => field.required = false);
+            }
+        }
+
+        // Function to add ingredient
+        document.getElementById('add-ingredient').addEventListener('click', function () {
+            const container = document.getElementById('ingredients-step-by-step');
+            const newIngredientForm = document.querySelector('.ingredient-form').cloneNode(true);
+            container.appendChild(newIngredientForm);
+        });
+
+        // Function to remove ingredient
+        document.getElementById('ingredients-step-by-step').addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove-ingredient')) {
+                event.target.closest('.ingredient-form').remove();
+            }
+        });
+
+        // Function to add instruction
+        document.getElementById('add-instruction').addEventListener('click', function () {
+            const container = document.getElementById('instructions-step-by-step');
+            const newInstructionForm = document.querySelector('.instruction-form').cloneNode(true);
+            container.appendChild(newInstructionForm);
+        });
+
+        // Function to remove instruction
+        document.getElementById('instructions-step-by-step').addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove-instruction')) {
+                event.target.closest('.instruction-form').remove();
+            }
+        });
+
+        // Function to add media
+        document.getElementById('add-media').addEventListener('click', function () {
+            const container = document.getElementById('media-container');
+            const newMediaForm = document.querySelector('.media-form').cloneNode(true);
+            container.appendChild(newMediaForm);
+        });
+
+        // Function to remove media
+        document.getElementById('media-container').addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove-media')) {
+                event.target.closest('.media-form').remove();
+            }
+        });
+
+        // Function to validate form fields
+        function validateField(field, errorElementId, errorMessage) {
+            if (!field.checkValidity()) {
+                document.getElementById(errorElementId).textContent = errorMessage;
+                return false;
+            } else {
+                document.getElementById(errorElementId).textContent = '';
+                return true;
+            }
+        }
+
+        // Form submission event - changed to console log the data instead of submitting the form
+        document.getElementById('recipe-form').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent form from being submitted to the server
+
+            let isValid = true;
+
+            // Validate fields
+            isValid &= validateField(document.getElementById('title'), 'title-error', 'Please enter a valid title.');
+            isValid &= validateField(document.getElementById('description'), 'description-error', 'Please enter a valid description.');
+            isValid &= validateField(document.getElementById('keywords'), 'keywords-error', 'Please enter valid keywords.');
+            isValid &= validateField(document.getElementById('servings'), 'servings-error', 'Please enter a valid number of servings.');
+            isValid &= validateField(document.getElementById('cook_time'), 'cook_time-error', 'Please enter a valid cook time.');
+
+            if (isValid) {
+                // If form is valid, prepare data for submission
+                const formData = new FormData(document.getElementById('recipe-form'));
+                
+                fetch('/api/recipes/', {  // Ensure this URL matches the endpoint handling the POST request
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest', // Optional, helps with CSRF handling
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    // Optionally handle response data or update UI
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            } else {
+                console.log("Form validation failed. Please correct the errors.");
+            }
+        });
+
+    </script>
+</body>
+</html>

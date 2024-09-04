@@ -35,6 +35,7 @@ from .spoonacular import get_recipe_information
 from django.core.cache import cache
 from .spoonacular import search_recipes, search_recipes_by_ingredients
 from hashlib import md5
+from .spoonacular import search_recipes, search_recipes_by_ingredients
 from .my_cookbook_serializers import MyCookbookSerializer
 
 
@@ -56,12 +57,6 @@ from dotenv import load_dotenv
 
 # Load environment variables from the .env file
 load_dotenv()
-
-# Retrieve the MongoDB URI from the .env file
-MONGODB_URI = os.getenv("MONGODB_URI")
-
-# Establish a connection to MongoDB
-# mongodb_connection = connect(host=MONGODB_URI)
 
 # Set up logging for the application
 logging.basicConfig(level=logging.INFO)
@@ -144,10 +139,10 @@ def home(request):
 class UserRegister(APIView):
     """View to handle user registration."""
     permission_classes = [permissions.AllowAny]  # Allow any user to register
-
-    def get(self, request):
-        """Render the registration page."""
-        return render(request, 'registration/register.html')
+# used to render the register.html template - replaced by signinmodal.js
+    # def get(self, request):
+    #     """Render the registration page."""
+    #     return render(request, 'registration/register.html')
 
     def post(self, request):
         """Handle user registration form submission."""
@@ -166,6 +161,8 @@ class UserRegister(APIView):
             return Response({"message": "User registered successfully! Check your email to confirm your account."}, 
                             status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
 
 # User Deletion
 class UserDeleteView(APIView):
@@ -324,23 +321,36 @@ class UserLogin(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        """Render the login page or delete the token if the user doesn't exist."""
+        """Check if the user is already logged in based on the token."""
         token_key = request.COOKIES.get('auth_token')
+        
         if token_key:
             try:
                 token = Token.objects.get(key=token_key)
                 if token.user:
-                    return render(request, 'login/login_user.html', {
-                        'message': f"Welcome back, {token.user.name}! You are already logged in."
-                    })
+                    response_data = {
+                        'username': token.user.username,  # Adjust if necessary
+                        'message': f"Welcome back, {token.user.username}!",
+                        'authenticated': True
+                    }
+                    return JsonResponse(response_data)
                 else:
-                    response = render(request, 'login/login_user.html')
+                    response = JsonResponse({
+                        'message': 'Token is not associated with a valid user.',
+                        'authenticated': False
+                    })
                     response.delete_cookie('auth_token')
                     return response
             except Token.DoesNotExist:
-                pass
-
-        return render(request, 'login/login_user.html')
+                return JsonResponse({
+                    'message': 'Invalid or expired token.',
+                    'authenticated': False
+                }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        return JsonResponse({
+            'message': 'No token provided.',
+            'authenticated': False
+        }, status=status.HTTP_401_UNAUTHORIZED)
 
     def post(self, request):
         """Handle user login form submission."""
@@ -355,28 +365,27 @@ class UserLogin(APIView):
             logger.error(f"Login failed for email: {email} (user not found)")
             return Response({'error': "Invalid email or password."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the password is correct
         if not self.check_password(password, user.password_hash):
             logger.error(f"Login failed for email: {email} (incorrect password)")
             return Response({'error': "Invalid email or password."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Generate or get the existing token
         token = Token.generate_token(user)
         token_key = token.key
 
-        # Set the authentication token in the cookie
-        response = render(request, 'login/login_user.html', {
-            'message': f"Login successful! Welcome, {user.name}."
+        response = JsonResponse({
+            'message': f"Login successful! Welcome, {user.name}.",  # Adjust if necessary
+            'auth_token': token_key
         })
+
         response.set_cookie(
             key='auth_token',
             value=token_key,
             httponly=True,
-            secure=False,  # Set to True in production with HTTPS
-            samesite='Strict'
+            # secure=False,  # Set to True in production with HTTPS
+            samesite='None'
         )
 
-        logger.info(f"Login successful for user: {user.email}")
+        logger.info(f"Login successful for user: {user.name}")
         return response
 
     def check_password(self, plain_password, hashed_password):

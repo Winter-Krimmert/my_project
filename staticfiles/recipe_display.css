@@ -1,0 +1,48 @@
+/* Basic styles for the recipe display page */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+.recipe-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.recipe-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px; /* Adjust width as needed */
+}
+
+.recipe-image,
+.ingredient-image {
+    max-width: 100%;
+    border-radius: 4px;
+}
+
+h1,
+h2,
+h3 {
+    color: #333;
+}
+
+ul,
+ol {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+a {
+    color: #337ab7;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

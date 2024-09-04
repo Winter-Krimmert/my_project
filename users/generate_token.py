@@ -1,12 +1,8 @@
 from decouple import config
-from my_project.users.models import Token, User
+from .models import Token, User
 from mongoengine import connect
 
-# Load environment variables
-MONGODB_URI = config('MONGODB_URI')
 
-# Connect to your MongoDB database
-# connect('Recipe-z', host=MONGODB_URI)
 
 # Step 1: Ensure the `Token` collection exists by creating a token
 def create_token_for_user(email):

@@ -1,0 +1,251 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+h1 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* Form Styles */
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px; /* Increased width to accommodate formsets */
+}
+
+form p {
+    margin-bottom: 15px;
+}
+
+form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+form input[type="text"],
+form input[type="number"],
+form input[type="url"],
+form select,
+form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+/* Scrollable Container Styles */
+.scrollable-container {
+    max-height: 200px; /* Adjust height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 1px solid #ddd; /* Border for visibility */
+    border-radius: 4px; /* Rounded corners */
+    margin-bottom: 15px; /* Space below */
+}
+
+/* Ingredient Form Styles */
+.ingredient-form,
+.instruction-form,
+.media-form {
+    margin-bottom: 15px; /* Space between each form */
+    padding: 10px;
+    background-color: #f1f1f1; /* Light background for each form */
+    border-radius: 4px;
+}
+
+.ingredient-form label,
+.instruction-form label,
+.media-form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Button Styles */
+form button[type="submit"],
+form button[type="button"] {
+    background-color: #5cb85c;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+form button[type="submit"]:hover,
+form button[type="button"]:hover {
+    background-color: #4cae4c;
+}
+
+/* Additional Button Styles */
+form button[type="button"] {
+    background-color: #337ab7;
+    margin-left: 10px;
+}
+
+form button[type="button"]:hover {
+    background-color: #23527c;
+}
+
+/* Remove Button Styles */
+.remove-ingredient,
+.remove-instruction,
+.remove-media {
+    background-color: #d9534f; /* Red background */
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.remove-ingredient:hover,
+.remove-instruction:hover,
+.remove-media:hover {
+    background-color: #c9302c; /* Darker red on hover */
+}
+
+/* Link Styles */
+a {
+    display: inline-block;
+    margin-top: 20px;
+    color: #337ab7;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #23527c;
+}
+
+/* Glow effect for required fields */
+input:invalid, textarea:invalid {
+    border: 2px solid red;
+    box-shadow: 0 0 5px red;
+}
+
+/* Error message styles */
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    display: none; /* Initially hidden */
+    margin-top: 0.5em;
+}
+
+/* Show error message */
+input:invalid + .error-message,
+textarea:invalid + .error-message {
+    display: block;
+}
+
+/* Responsive Styles */
+
+/* Media Query 1: For tablets and small desktops */
+@media (max-width: 900px) {
+    form {
+        width: 90%;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+}
+
+/* Media Query 2: For mobile devices */
+@media (max-width: 600px) {
+    form {
+        width: 90%;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+}
+
+/* New Styles for Additional Components */
+
+/* Hide elements initially */
+#ingredients-single-block,
+#instructions-single-block {
+    display: none;
+}
+
+/* Media form container styling */
+#media-container {
+    margin-top: 20px;
+}
+
+/* Specific styles for toggling sections */
+input[name="ingredient_entry_method"] + label,
+input[name="instruction_entry_method"] + label {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* Placeholder styles for measurement system based on input method */
+#measurement_system {
+    margin-bottom: 15px;
+}
+
+/* Radio button styling for clear visibility */
+input[type="radio"] {
+    margin-right: 5px;
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+/* Updating placeholder styles based on the selected measurement system */
+.ingredient-form input[name="ingredient_unit"]::placeholder {
+    font-style: italic;
+    color: #888;
+}
+
+/* Adjusting the visibility and interaction of toggled sections */
+#ingredients-step-by-step,
+#instructions-step-by-step {
+    display: block;
+}
+
+#ingredients-single-block textarea,
+#instructions-single-block textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+/* Margin and padding adjustments for toggled sections */
+#ingredients-step-by-step,
+#instructions-step-by-step,
+#ingredients-single-block,
+#instructions-single-block {
+    margin-top: 10px;
+}

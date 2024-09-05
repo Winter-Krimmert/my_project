@@ -4,18 +4,17 @@ from mongoengine import connect
 from pymongo import MongoClient
 import gridfs
 from decouple import config
-
+from corsheaders.defaults import default_headers
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secret Key
 SECRET_KEY = config('SECRET_KEY')
-DEBUG = False
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'recipe-z.onrender.com']
+DEBUG = True  # Set to False in production
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'recipe-z.onrender.com', 'recipe-z.com', 'localhost:3000', 'recipe-z.vercel.app']
 
 # Spoonacular API Key
 SPOONACULAR_API_KEY = config('SPOONACULAR_API_KEY')
-
 
 # MongoDB Connection
 connect(
@@ -43,6 +42,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'social_django',
     'drf_yasg',
+    'corsheaders',
+    'debug_toolbar',
 ]
 
 AUTHENTICATION_BACKENDS = (
@@ -62,8 +63,12 @@ SOCIAL_AUTH_FACEBOOK_SECRET = config('SOCIAL_AUTH_FACEBOOK_SECRET')
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'public_profile']
 
 # Redirect URIs
-FACEBOOK_REDIRECT_URI = 'http://127.0.0.1:8000/facebook/callback/'
-GOOGLE_REDIRECT_URI = 'http://localhost:8000/google/callback/'
+# FACEBOOK_REDIRECT_URI = 'http://127.0.0.1:8000/facebook/callback/'
+# GOOGLE_REDIRECT_URI = 'http://localhost:8000/google/callback/'
+
+FACEBOOK_REDIRECT_URI = 'https://recipe-z.vercel.app/facebook/callback/'
+GOOGLE_REDIRECT_URI = 'https://recipe-z.vercel.app/google/callback/'
+
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -95,6 +100,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # This should be at the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -104,16 +110,46 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'users.views.TokenMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
 ]
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+# CORS settings
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'https://recipe-z.vercel.app',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'authorization',
+    'x-csrftoken',
+]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
 
 # CSRF settings
-CSRF_COOKIE_SECURE = False  # Set to True if using HTTPS
-CSRF_COOKIE_HTTPONLY = True  # To prevent CSRF cookie access from JavaScript
+CSRF_COOKIE_SAMESITE = 'None'   
+CSRF_COOKIE_SECURE = not DEBUG  # Set to True in production (when using HTTPS)
+CSRF_COOKIE_HTTPONLY = False  # To prevent CSRF cookie access from JavaScript
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",  # React frontend
+    "https://recipe-z.vercel.app",  # Vercel frontend
+]
 CSRF_COOKIE_NAME = 'csrftoken'
 
 ROOT_URLCONF = 'my_project.urls'
-
 
 TEMPLATES = [
     {
@@ -126,8 +162,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'social_django.context_processors.backends',
-                'social_django.context_processors.login_redirect',
+                # 'social_django.context_processors.backends',
+                # 'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -146,7 +182,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -160,7 +197,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    # Change this line to use `drf-yasg` schema if applicable
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
@@ -176,4 +212,28 @@ CACHES = {
             'MAX_ENTRIES': 1000  # Adjust the number of cache entries based on your needs
         }
     }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
 }

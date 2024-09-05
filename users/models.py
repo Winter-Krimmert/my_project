@@ -11,6 +11,7 @@ from gridfs import GridFS
 from django.conf import settings
 from .GridFS import MediaFile
 from my_project.settings import fs
+import uuid
 
 
 
@@ -29,13 +30,16 @@ class User(Document):
         regex=r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'  
     )
     password_hash = StringField(required=True)  
-    social_logins = EmbeddedDocumentField(SocialLogin)  
+    social_logins = EmbeddedDocumentField('SocialLogin')  
     my_cookbooks = ListField(ReferenceField('MyCookbook'))  
     my_plates = ListField(ReferenceField('MyPlate'))
-    my_cookbooks = ListField(ReferenceField('MyCookbook'))   
     created_at = DateTimeField(default=datetime.now(timezone.utc))  
     updated_at = DateTimeField(default=datetime.now(timezone.utc))  
     is_active = BooleanField(default=True)  
+
+    # New fields for password reset
+    reset_token = StringField()
+    reset_token_expiration = DateTimeField()
 
     @property
     def is_authenticated(self):
@@ -54,6 +58,17 @@ class User(Document):
         for plate in self.my_plates:
             plate.delete()
         self.delete()  
+
+    def set_reset_token(self):
+        # Generate a token (this is just an example, consider using a more secure method)
+        self.reset_token = str(uuid.uuid4())
+        self.reset_token_expiration = datetime.utcnow() + timedelta(hours=1)
+        self.save()
+
+    def clear_reset_token(self):
+        self.reset_token = None
+        self.reset_token_expiration = None
+        self.save()
 
 # Token Document for Authentication
 

@@ -1,16 +1,10 @@
 from decouple import config
 from datetime import datetime, timezone
 from mongoengine import connect
-from my_project.users.models import Recipe, Ingredient, IngredientAmount, Instruction, Media, MyPlate, User
+from .models import Recipe, Ingredient, IngredientAmount, Instruction, Media, MyPlate, User
 
-# Load environment variables
-MONGODB_URI = config('MONGODB_URI')
 
-# Connect to MongoDB using mongoengine
-# connect(
-#     db='Recipe-z',
-#     host=MONGODB_URI
-# )
+
 
 # Define the sample recipe data
 recipe_data = {

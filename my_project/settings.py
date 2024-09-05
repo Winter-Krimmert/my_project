@@ -131,9 +131,6 @@ INTERNAL_IPS = [
 ]
 
 # CORS settings
-# Adjust these based on the environment:
-# For local development:
-# CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
 
 # For production:
 CORS_ALLOWED_ORIGINS = [
@@ -141,10 +138,11 @@ CORS_ALLOWED_ORIGINS = [
     'https://recipe-z.vercel.app',  # Vercel frontend during production
 ]
 
-CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True  # Required for sending cookies (e.g., CSRF and auth token)
+
 CORS_ALLOW_HEADERS = list(default_headers) + [
-    'authorization',
-    'x-csrftoken',
+    'Authorization',  # Ensure proper casing for 'Authorization'
+    'X-CSRFToken',    # Ensure proper casing for 'X-CSRFToken'
 ]
 
 CORS_ALLOW_METHODS = [
@@ -155,6 +153,7 @@ CORS_ALLOW_METHODS = [
     'DELETE',
     'OPTIONS',
 ]
+
 
 # CSRF settings
 CSRF_COOKIE_SAMESITE = 'None'   

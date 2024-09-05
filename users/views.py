@@ -387,7 +387,7 @@ class UserLogin(APIView):
             key='auth_token',
             value=token_key,
             httponly=True,
-            secure=True,  # Set to True in production with HTTPS
+            secure=False,  # Set to True in production with HTTPS
             samesite='None'
         )
 

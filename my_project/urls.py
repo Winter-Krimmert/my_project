@@ -22,6 +22,7 @@ from users.views import (
     MyCookbookDetailView,
     AddRecipeToCookbookView,
     RemoveRecipeFromCookbookView,
+    get_csrf_token,
     # test_cors,
     # ForgotPasswordView,
     # send_test_email,
@@ -54,6 +55,8 @@ urlpatterns = [
     path('api/register/', UserRegister.as_view(), name='user-register'),
     path('api/login/', UserLogin.as_view(), name='user-login'),
     path('api/logout/', LogoutView.as_view(), name='user-logout'),
+    path('api/get-csrf-token/', get_csrf_token, name='get_csrf_token'),
+
 
     # Password reset endpoints
     # path('api/forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),

@@ -37,6 +37,7 @@ from .spoonacular import search_recipes, search_recipes_by_ingredients
 from hashlib import md5
 from .spoonacular import search_recipes, search_recipes_by_ingredients
 from .my_cookbook_serializers import MyCookbookSerializer
+from django.middleware.csrf import get_token
 
 
 
@@ -69,6 +70,11 @@ fs = settings.GRIDFS_FS
 def custom_404_view(request, exception):
     """Render a custom 404 error page."""
     return render(request, '404.html', status=404)
+
+# Get CSRF token
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({'csrfToken': csrf_token})
 
 # Middleware for Token Validation
 class TokenMiddleware(MiddlewareMixin):
@@ -400,7 +406,7 @@ class LogoutView(APIView):
     authentication_classes = [CookieTokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
-    @csrf_exempt
+
     def post(self, request, *args, **kwargs):
         """Handle logout by invalidating the token and clearing the cookie."""
         token_key = request.COOKIES.get('auth_token')

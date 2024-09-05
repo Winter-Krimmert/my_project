@@ -111,6 +111,7 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'users.views.TokenMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+
 ]
 
 INTERNAL_IPS = [
@@ -139,8 +140,9 @@ CORS_ALLOW_METHODS = [
 ]
 
 # CSRF settings
+CSRF_COOKIE_SAMESITE = 'None'   
 CSRF_COOKIE_SECURE = not DEBUG  # Set to True in production (when using HTTPS)
-CSRF_COOKIE_HTTPONLY = True  # To prevent CSRF cookie access from JavaScript
+CSRF_COOKIE_HTTPONLY = False  # To prevent CSRF cookie access from JavaScript
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",  # React frontend
     "https://recipe-z.vercel.app",  # Vercel frontend

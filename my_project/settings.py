@@ -156,8 +156,14 @@ CORS_ALLOW_METHODS = [
 
 
 # CSRF settings
-CSRF_COOKIE_SAMESITE = 'None'   
-CSRF_COOKIE_SECURE = True  # Set to True in production (when using HTTPS)
+# CSRF settings
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True  # Ensure this is True for HTTPS (production)
+
+# Auth token settings
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True  # Ensure this is True for HTTPS (production)
+
 CSRF_COOKIE_HTTPONLY = False  # To prevent CSRF cookie access from JavaScript
 # Adjust these based on the environment:
 # For local development:

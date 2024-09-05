@@ -10,8 +10,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secret Key
 SECRET_KEY = config('SECRET_KEY')
-DEBUG = True  # Set to False in production
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'recipe-z.onrender.com', 'recipe-z.com', 'localhost:3000', 'recipe-z.vercel.app']
+
+# Debug mode
+DEBUG = True  # Set to False in production for security reasons
+
+# Allowed Hosts
+ALLOWED_HOSTS = [
+    '127.0.0.1',                   # Localhost for development
+    'localhost',                   # Localhost for development
+    'recipe-z.onrender.com',       # Production domain
+    'recipe-z.com',               # Production domain
+    'localhost:3000',             # React frontend during local development
+    'recipe-z.vercel.app',         # Vercel frontend during production
+]
 
 # Spoonacular API Key
 SPOONACULAR_API_KEY = config('SPOONACULAR_API_KEY')
@@ -63,12 +74,14 @@ SOCIAL_AUTH_FACEBOOK_SECRET = config('SOCIAL_AUTH_FACEBOOK_SECRET')
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'public_profile']
 
 # Redirect URIs
+# Adjust these based on the environment:
+# For local development:
 # FACEBOOK_REDIRECT_URI = 'http://127.0.0.1:8000/facebook/callback/'
 # GOOGLE_REDIRECT_URI = 'http://localhost:8000/google/callback/'
 
+# For production:
 FACEBOOK_REDIRECT_URI = 'https://recipe-z.vercel.app/facebook/callback/'
 GOOGLE_REDIRECT_URI = 'https://recipe-z.vercel.app/google/callback/'
-
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -111,7 +124,6 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
     'users.views.TokenMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-
 ]
 
 INTERNAL_IPS = [
@@ -119,9 +131,14 @@ INTERNAL_IPS = [
 ]
 
 # CORS settings
+# Adjust these based on the environment:
+# For local development:
+# CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
+
+# For production:
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'https://recipe-z.vercel.app',
+    'http://localhost:3000',        # React frontend during local development
+    'https://recipe-z.vercel.app',  # Vercel frontend during production
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -141,11 +158,16 @@ CORS_ALLOW_METHODS = [
 
 # CSRF settings
 CSRF_COOKIE_SAMESITE = 'None'   
-CSRF_COOKIE_SECURE = not DEBUG  # Set to True in production (when using HTTPS)
+CSRF_COOKIE_SECURE = True  # Set to True in production (when using HTTPS)
 CSRF_COOKIE_HTTPONLY = False  # To prevent CSRF cookie access from JavaScript
+# Adjust these based on the environment:
+# For local development:
+# CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+
+# For production:
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",  # React frontend
-    "https://recipe-z.vercel.app",  # Vercel frontend
+    "http://localhost:3000",  # React frontend during local development
+    "https://recipe-z.vercel.app",  # Vercel frontend during production
 ]
 CSRF_COOKIE_NAME = 'csrftoken'
 

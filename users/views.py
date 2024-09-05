@@ -387,7 +387,7 @@ class UserLogin(APIView):
             key='auth_token',
             value=token_key,
             httponly=True,
-            # secure=False,  # Set to True in production with HTTPS
+            secure=True,  # Set to True in production with HTTPS
             samesite='None'
         )
 
@@ -406,15 +406,17 @@ class LogoutView(APIView):
     authentication_classes = [CookieTokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
-
     def post(self, request, *args, **kwargs):
         """Handle logout by invalidating the token and clearing the cookie."""
-        token_key = request.COOKIES.get('auth_token')
+        token_key = request.COOKIES.get('auth_token')  # Get token from cookie
+        
         if token_key:
             try:
+                # Try to retrieve the token from the database
                 token = Token.objects.get(key=token_key)
-                if not token.is_expired():
-                    token.delete()
+                
+                if not token.is_expired():  # Check if the token is not expired
+                    token.delete()  # Delete the token from the database
                     response = Response({"detail": _("Successfully logged out.")}, status=status.HTTP_200_OK)
                 else:
                     response = Response({"detail": _("Token is expired or invalid.")}, status=status.HTTP_400_BAD_REQUEST)
@@ -423,6 +425,7 @@ class LogoutView(APIView):
         else:
             response = Response({"detail": _("Token not provided.")}, status=status.HTTP_400_BAD_REQUEST)
         
+        # Clear the auth_token cookie from the user's browser
         response.delete_cookie('auth_token')
         return response
 
